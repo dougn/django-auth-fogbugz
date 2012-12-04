@@ -24,7 +24,7 @@ AUTH_FOGBUGZ_SERVER = "https://my_account.fogbugz.com/"
 # If your FogBugz server is using the Active Directory or LDAP integration
 # for authentication, then you need to set this to True in order to have
 # authentication work properly.
-# If you are also have AUTH_FOGBUGZ_CREATE_NEW_USERS set to True, then the
+# If you are also have AUTH_FOGBUGZ_AUTO_CREATE_USERS set to True, then the
 # first time a user logs in to the django site, they must use their LDAP
 # username, and not their e-mail address.
 #
@@ -67,6 +67,9 @@ AUTH_FOGBUGZ_SERVER = "https://my_account.fogbugz.com/"
 #     for case in resp.cases.findAll('case'):
 #          top_ten += "%s: %s\n" % (case.ixbug.string, 
 #                                   case.stitle.string.encode('UTF-8'))
+#
+# You must also add 'django-auth-fogbugz' as django app in your
+# INSTALLED_APPS when enabling this.
 #
 #AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE = False
 

@@ -1,19 +1,30 @@
+===================================================================
+django-auth-fogbugz - Django FogBugz Authentication Backend
+===================================================================
+
 This authentication backend for django, will authenticate against a
 FogBugz (http://www.fogcreek.com/fogbugz/) issue tracker. It uses the
 python interface (https://developers.fogbugz.com/default.asp?W199)
 to the FogBugz API (http://fogbugz.stackexchange.com/fogbugz-xml-api).
 
-It is HIGHLY recommended that you use an SSL connection to the FogBugz
-server for secure authentication.
+.. warning::
+   It is HIGHLY recommended that you use an SSL connection to the FogBugz
+   server for secure authentication.
 
+User Model Extension
+-----------------------------
 There is an extension profile model which is included with this auth backend
-to help with integrating with the FogBugz API::
+to help with integrating with the FogBugz API when you set
+AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE to True in your settings, and include
+``django-auth-fogbugz`` as an application in INSTALLED_APPS (see below)::
 
     user.fogbugzprofile.token
     user.fogbugzprofile.ixPerson
 
 
-Example::
+Example:
+
+.. code:: python
 
     import fogbugz
     from django.conf import settings
@@ -29,7 +40,11 @@ Example::
                                   case.stitle.string.encode('UTF-8'))
 
 
-Settings::
+Settings
+--------
+
+.. code:: python
+
 
     AUTH_FOGBUGZ_SERVER = "https://my_account.fogbugz.com/"
     
@@ -45,7 +60,7 @@ Settings::
     
     # If your FogBugz server is using the LDAP integration for authentication, then
     # You need to set this to True in order to have authentication work properly.
-    # If you are also have AUTH_FOGBUGZ_CREATE_NEW_USERS set to True, then the
+    # If you are also have AUTH_FOGBUGZ_AUTO_CREATE_USERS set to True, then the
     # first time a user logs in to the django site, they must use their LDAP
     # username, and not their e-mail address.
     #
@@ -73,6 +88,9 @@ Settings::
     #             access to the user models to have a login authentication token
     #             for non-expired users. This could allow Django code to access
     #             the FogBugz server as those users.
+    #
+    # You must also add 'django-auth-fogbugz' as django app in your
+    # INSTALLED_APPS when enabling this.
     #
     #AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE = False
 

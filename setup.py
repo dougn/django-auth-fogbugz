@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name="django-auth-fogbugz",
-    version="0.1.0",
+    version="0.1.2",
     description="Django FogBugz authentication backend",
     long_description=open('README.rst').read(),
     url="https://github.com/dougn/django-auth-fogbugz/",
