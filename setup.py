@@ -24,8 +24,8 @@ setup(
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: BSD License",
         "Topic :: Internet :: WWW/HTTP",
-        "Topic :: System :: Systems Administration :: Authentication/Directory"
-        "Topic :: System :: Systems Administration :: Authentication/Directory :: FogBugz",
+        "Topic :: System :: Systems Administration :: Authentication/Directory",
+        #"Topic :: System :: Systems Administration :: Authentication/Directory :: FogBugz",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     keywords=["django", "fogbugz", "authentication", "auth"],
