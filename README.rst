@@ -75,5 +75,5 @@ Settings::
     #             the FogBugz server as those users.
     #
     #AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE = False
-    #SESSION_COOKIE_AGE = 60*60*24*7
+
     
