@@ -70,7 +70,7 @@ conflict.
 
 When LDAP or AD is used either the LDAP/AD username or the e-mail address may
 be used, and again the matching is case-insensitive. For AD users, the
-'DOMAIN\' prefix can be used. 
+'DOMAIN\\' prefix can be used. 
 
 If your FogBugz server is configured for LDAP or Active Directory integration,
 and you wish for your Django login to accept those usernames as well, then you
@@ -130,7 +130,7 @@ you need to set :ref:`SERVER_USES_LDAP` to ``True``. This will add further
 restrictions when hand creating Django users:
 
 * The username must be the LDAP/AD username.
-* The username must be without the 'DOMAIN\' prefix for Active Directory.
+* The username must be without the 'DOMAIN\\' prefix for Active Directory.
 * The username must be all lowercase.
 
 The need to lowercase is because FogBugz does case insensitive matching on the
