@@ -1,2 +1,2 @@
-version = (0, 1, 2)
-version_string = "0.1.2"
+version = (1, 0, 0)
+version_string = '.'.join(str(x) for x in version)

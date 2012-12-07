@@ -7,3 +7,6 @@ django_auth_fogbugz/backend.py
 django_auth_fogbugz/django_auth_fogbugz_settings.py
 django_auth_fogbugz/models.py
 django_auth_fogbugz/tests.py
+docs/Makefile
+docs/conf.py
+docs/index.rst

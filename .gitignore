@@ -1,4 +1,5 @@
-jsontree.egg-info
+django_auth_fogbugz.egg-info
+commit.txt
 build
 dist
 env

@@ -38,8 +38,11 @@ except ImportError:
     
 class FogBugzProfile(models.Model):
     user = models.OneToOneField(UserModel, primary_key=True)
-    token = models.CharField(max_length=32)
+    token = models.CharField(max_length=32, default='', blank=True)
     ixPerson = models.PositiveIntegerField()
+    is_normal = models.BooleanField()
+    is_community = models.BooleanField()
+    is_administrator = models.BooleanField()
 
     def __unicode__(self):
         return u"%d %d %s" % (self.ixPerson, self.user.id, self.user.first_name)

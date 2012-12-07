@@ -15,11 +15,14 @@ User Model Extension
 -----------------------------
 There is an extension profile model which is included with this auth backend
 to help with integrating with the FogBugz API when you set
-AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE to True in your settings, and include
+``AUTH_FOGBUGZ_ENABLE_PROFILE`` to ``True`` in your settings, and include
 ``django-auth-fogbugz`` as an application in INSTALLED_APPS (see below)::
 
     user.fogbugzprofile.token
     user.fogbugzprofile.ixPerson
+    user.fogbugzprofile.is_normal
+    user.fogbugzprofile.is_community
+    user.fogbugzprofile.is_administrator
 
 
 Example:
@@ -51,12 +54,12 @@ Settings
     # By default community users will not be authenticated. If you wish to include
     # FogBugz community user logins, set this to True.
     #
-    #AUTH_FOGBUGZ_ALLOW_COMMUNITY = False
+    AUTH_FOGBUGZ_ALLOW_COMMUNITY = False
     
     # Have django-auth-fogbugz create the django user if it does not already
     # exist, and the user authenticates.
     #
-    #AUTH_FOGBUGZ_AUTO_CREATE_USERS = False
+    AUTH_FOGBUGZ_AUTO_CREATE_USERS = False
     
     # If your FogBugz server is using the LDAP integration for authentication, then
     # You need to set this to True in order to have authentication work properly.
@@ -64,34 +67,56 @@ Settings
     # first time a user logs in to the django site, they must use their LDAP
     # username, and not their e-mail address.
     #
-    #AUTH_FOGBUGZ_SERVER_USES_LDAP = False
+    AUTH_FOGBUGZ_SERVER_USES_LDAP = False
     
     # FogBugz has a concept if a superuser, the 'administrator' flag on accounts.
     # The following settings will map this information to the django account.
     #
-    #AUTH_FOGBUGZ_MAP_ADMIN_AS_SUPER = False
-    #AUTH_FOGBUGZ_MAP_ADMIN_AS_STAFF = False
+    AUTH_FOGBUGZ_MAP_ADMIN_AS_SUPER = False
+    AUTH_FOGBUGZ_MAP_ADMIN_AS_STAFF = False
 
     # There is an extension profile model which is included with this auth backend
     # to help with integrating with the FogBugz API::
     #
-    #     user.fogbugz.token
-    #     user.fogbugz.ixPerson
+    #     user.fogbugzprofile.ixPerson
+    #     user.fogbugzprofile.is_community
+    #     user.fogbugzprofile.is_administrator
     #
-    # ..warning:: If you enable this profile, make sure your SESSION_COOKIE_AGE
-    #             is less than or equal to the FogBugz expiration time (2 weeks,
-    #             same as the django default) and that FogBugz Server
-    #             Configuraition for Authentication logon is set to
-    #            ``"Remember Me" Allowed``.
     #
-    # ..warning:: Enabling the user profile extension will allow any code with
+    # You must also add 'django-auth-fogbugz' as django app in your
+    # INSTALLED_APPS when enabling this.
+    #
+    AUTH_FOGBUGZ_ENABLE_PROFILE = False
+
+    # With the fogbugz profile extension enabled, there is the option to store
+    # the serurity login token for the FogBugz user. This token can be used
+    # instead of the username and password to log into the FogBugz server.
+    # The authentication token can be accessed via the profile::
+    #
+    #     user.fogbugzprofile.token
+    #
+    #
+    # ..note:: If you enable token storage, make sure your SESSION_COOKIE_AGE
+    #          is less than or equal to the FogBugz expiration time (2 weeks,
+    #          same as the django default) and that FogBugz Server
+    #          Configuraition for Authentication logon is set to
+    #          ``"Remember Me" Allowed``.
+    #
+    # ..warning:: Enabling the profile token extension will allow any code with
     #             access to the user models to have a login authentication token
     #             for non-expired users. This could allow Django code to access
     #             the FogBugz server as those users.
     #
     # You must also add 'django-auth-fogbugz' as django app in your
-    # INSTALLED_APPS when enabling this.
+    # INSTALLED_APPS and set AUTH_FOGBUGZ_ENABLE_PROFILE to true
+    # when enabling this.
     #
-    #AUTH_FOGBUGZ_ENABLE_TOKEN_PROFILE = False
-
+    AUTH_FOGBUGZ_ENABLE_PROFILE_TOKEN = False
+    
+    # Keep ModelBackend around for per-user permissions and maybe a local
+    # superuser.
+    AUTHENTICATION_BACKENDS = (
+        'django_auth_fogbugz.backend.FogBugzBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
     

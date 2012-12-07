@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
-from distutils.core import setup
+from setuptools import setup, find_packages
+import django_auth_fogbugz
 
 setup(
     name="django-auth-fogbugz",
-    version="0.1.2",
+    version=django_auth_fogbugz.version_string,
     description="Django FogBugz authentication backend",
     long_description=open('README.rst').read(),
     url="https://github.com/dougn/django-auth-fogbugz/",
@@ -13,7 +13,7 @@ setup(
     license="BSD",
     packages=["django_auth_fogbugz"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.5",
@@ -28,5 +28,6 @@ setup(
         #"Topic :: System :: Systems Administration :: Authentication/Directory :: FogBugz",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    install_requires=['fogbugz',],
     keywords=["django", "fogbugz", "authentication", "auth"],
 )
