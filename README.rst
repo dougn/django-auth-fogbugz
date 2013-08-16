@@ -7,6 +7,9 @@ FogBugz (http://www.fogcreek.com/fogbugz/) issue tracker. It uses the
 python interface (https://developers.fogbugz.com/default.asp?W199)
 to the FogBugz API (http://fogbugz.stackexchange.com/fogbugz-xml-api).
 
+Source code, and issues can be found on GitHub (https://github.com/dougn/django-auth-fogbugz).
+Full documentation is on PyPi packages (http://packages.python.org/django-auth-fogbugz/).
+
 .. warning::
    It is HIGHLY recommended that you use an SSL connection to the FogBugz
    server for secure authentication.

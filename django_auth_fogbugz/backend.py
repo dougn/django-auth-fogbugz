@@ -49,7 +49,7 @@ class FogBugzSettings(object):
     """
     Django setting wrapper, ensuring all values exist with defaults.
     """
-    _server_validator = URLValidator(
+    _server_validator = URLValidator(message=
         "AUTH_FOGBUGZ_SERVER must be set to a valid fogbugz api url.")
     
     defaults = dict(
@@ -73,7 +73,7 @@ class FogBugzSettings(object):
 
         for name, (default, test) in self.defaults.iteritems():                
             value = getattr(settings, prefix + name, default)
-
+                        
             if callable(test):
                 test(value)
 
@@ -102,7 +102,7 @@ class FogBugzBackend(ModelBackend):
         username = username.lower()
         
         fbcfg = FogBugzSettings()
-                
+                        
         ## first check to see if there is already a user account for this
         ## user.
         user = None
@@ -200,7 +200,7 @@ class FogBugzBackend(ModelBackend):
             ## Log:
             logger.debug("Login Failed: "
                 "Authentication Failure on Server (%s) for user (%s): %s",
-                fbcfg.SERVER, username, e.message)
+                fbcfg.SERVER, username, str(e))
             #### RED_FLAG: check for inactive user and set in Django if there
             ####           is a Django user.
             

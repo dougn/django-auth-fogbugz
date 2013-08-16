@@ -5,6 +5,8 @@ Django-Auth-FogBugz
 This authentication backend enables a Django project to authenticate against
 any FogBugz (http://www.fogcreek.com/fogbugz/) server.
 
+Source code, and issues can be found on GitHub (https://github.com/dougn/django-auth-fogbugz).
+
 To use it, add :py:class:`.django_auth_fogbugz.backend.FogBugzBackend` to
 ``AUTHENTICATION_BACKENDS``. Additional functionality can be enabled if you
 add ``django_auth_fogbugz`` to ``INSTALLED_APPLICATIONS``;
@@ -260,7 +262,7 @@ Example of using the :py:class:`FogBugzProfile` with FogBugzPy:
     from django.shortcuts import render
     from django.contrib.auth.decorators import login_required
     
-    
+    @login_required
     def my_view(request):
         fb = fogbugz.FogBugz(settings.AUTH_FOGBUGZ_SERVER,
                              request.user.fogbugzprofile.token)
