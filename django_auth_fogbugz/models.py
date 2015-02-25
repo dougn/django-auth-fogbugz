@@ -6,11 +6,11 @@
 #
 #     1. Redistributions of source code must retain the above copyright notice,
 #        this list of conditions and the following disclaimer.
-#     
+#
 #     2. Redistributions in binary form must reproduce the above copyright
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
-# 
+#
 #     3. Neither the name of Django nor the names of its contributors may be
 #        used to endorse or promote products derived from this software without
 #        specific prior written permission.
@@ -27,17 +27,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from django.contrib.auth.models import User
 from django.db import models
+from django.conf import settings
 
-try:
-    from django.contrib.auth import get_user_model
-    UserModel = get_user_model()
-except ImportError:
-    UserModel = User
-    
+
 class FogBugzProfile(models.Model):
-    user = models.OneToOneField(UserModel, primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, primary_key=True)
     token = models.CharField(max_length=32, default='', blank=True)
     ixPerson = models.PositiveIntegerField()
     is_normal = models.BooleanField()
@@ -46,4 +41,3 @@ class FogBugzProfile(models.Model):
 
     def __unicode__(self):
         return u"%d %d %s" % (self.ixPerson, self.user.id, self.user.first_name)
-        

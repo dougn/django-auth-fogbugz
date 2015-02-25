@@ -6,11 +6,11 @@
 #
 #     1. Redistributions of source code must retain the above copyright notice,
 #        this list of conditions and the following disclaimer.
-#     
+#
 #     2. Redistributions in binary form must reproduce the above copyright
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
-# 
+#
 #     3. Neither the name of Django nor the names of its contributors may be
 #        used to endorse or promote products derived from this software without
 #        specific prior written permission.
@@ -28,7 +28,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from django.contrib.auth.backends import ModelBackend
-from django.core.validators import URLValidator, email_re
+from django.core.validators import URLValidator, EmailValidator
+from django.core.exceptions import ValidationError
 
 try:
     from django.contrib.auth import get_user_model
@@ -36,22 +37,22 @@ except ImportError:
     from django.contrib.auth.models import User
     def get_user_model():
         return User
-    
+
 import sys
 import traceback
 import logging
 
 import fogbugz
 
-from models import FogBugzProfile
-    
+from .models import FogBugzProfile
+
 class FogBugzSettings(object):
     """
     Django setting wrapper, ensuring all values exist with defaults.
     """
     _server_validator = URLValidator(message=
         "AUTH_FOGBUGZ_SERVER must be set to a valid fogbugz api url.")
-    
+
     defaults = dict(
     #   SETTING_NAME         =     ('Default Value', Validator),
         SERVER               =     (None,            _server_validator),
@@ -71,14 +72,14 @@ class FogBugzSettings(object):
         """
         from django.conf import settings
 
-        for name, (default, test) in self.defaults.iteritems():                
+        for name, (default, test) in self.defaults.items():
             value = getattr(settings, prefix + name, default)
-                        
+
             if callable(test):
                 test(value)
 
             setattr(self, name, value)
-    
+
 def _username_from_email(email):
     return email.lower()
 
@@ -88,45 +89,46 @@ class NullHandler(logging.Handler):
 
 logger = logging.getLogger('django_auth_fogbugz')
 logger.addHandler(NullHandler())
-            
+
 class FogBugzBackend(ModelBackend):
-    
+
     def authenticate(self, username=None, password=None):
         if not username or not password:
             return None
-        
+
         ## FogBugz does case insensitive matching. We lower-case the input
         ## and then do an insensitive match on the e-mail field.
         ## This will allow for hand created accounts, and for when
         ## LDAP is enabled.
         username = username.lower()
-        
+
         fbcfg = FogBugzSettings()
-                        
+
         ## first check to see if there is already a user account for this
         ## user.
         user = None
         email = ''
         ixPerson = 0
         email_login = False
-        
         UserModel = get_user_model()
         ## the problem here is that it could be the email address
         ## or an LDAP user login.
         try:
-            if email_re.search(username):
+            try:
+                EmailValidator()(username)
                 ## it's an e-mail address...
                 email_login = True
                 user = UserModel.objects.get(email__iexact=username)
-            elif '\\' in username:
-                ## LDAP username with domain specified, strip the '\\'
-                username = username.split('\\')[-1]
-                user = UserModel.objects.get_by_natural_key(username)
-            else:
-                user = UserModel.objects.get_by_natural_key(username)
+            except ValidationError:
+                if '\\' in username:
+                    ## LDAP username with domain specified, strip the '\\'
+                    username = username.split('\\')[-1]
+                    user = UserModel.objects.get_by_natural_key(username)
+                else:
+                    user = UserModel.objects.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             logger.debug("No pre-existing user model for user (%s).", username)
-                
+
         if not user and not fbcfg.AUTO_CREATE_USERS:
             ## no existing user, and not allowed to create new ones
             logger.debug(
@@ -143,7 +145,7 @@ class FogBugzBackend(ModelBackend):
                          "username and AUTH_FOGBUGZ_SERVER_USES_LDAP "
                          "is not set. ", username)
             return None
-        
+
         if not user and email_login and fbcfg.SERVER_USES_LDAP:
             ## no existing user, and logging in with e-mail, but
             ## fogbugz has LDAP integration allowing for logging in
@@ -158,18 +160,18 @@ class FogBugzBackend(ModelBackend):
                          "must login with their LDAP username the "
                          "first time. ", username, fbcfg.SERVER)
             return None
-        
+
 
 
         try:
             fb = fogbugz.FogBugz(fbcfg.SERVER)
-        except fogbugz.FogBugzConnectionError, e:
+        except fogbugz.FogBugzConnectionError as e:
             ## Log the error
             logger.error("Login Failed: "
                          "FogBugz Server (%s) Connection Error: %s",
                          fbcfg.SERVER, e.message)
             return None
-        
+
         if user and fbcfg.ENABLE_PROFILE:
             ## get the old token from the profile
             token = None
@@ -184,7 +186,7 @@ class FogBugzBackend(ModelBackend):
                 try:
                     ## Loging off explicitly will clear the token
                     fb.logoff()
-                except Exception, e:
+                except Exception as e:
                     ## reset it if the logoff failed. Could fail for many
                     ## reasons. Later logon logic will handle meaningful
                     ## errors.
@@ -196,16 +198,16 @@ class FogBugzBackend(ModelBackend):
 
         try:
             fb.logon(username, password)
-        except fogbugz.FogBugzLogonError, e:
+        except fogbugz.FogBugzLogonError as e:
             ## Log:
             logger.debug("Login Failed: "
                 "Authentication Failure on Server (%s) for user (%s): %s",
                 fbcfg.SERVER, username, str(e))
             #### RED_FLAG: check for inactive user and set in Django if there
             ####           is a Django user.
-            
+
             return None
-            
+
         ## NOTE: FogBugz allows for logging in with the e-mail address
         ##       as well as the username. Make sure you have the proper
         ##       username.
@@ -221,12 +223,12 @@ class FogBugzBackend(ModelBackend):
                          username, fbcfg.SERVER)
             try:
                 fb.logoff()
-            except Exception, e:
+            except Exception as e:
                 logger.warning("Failed to logoff community user (%s) from "
                                "server (%s): %s", username, fbcfg.SERVER,
                                str(e))
             return None
-        
+
         if not ixPerson:
             ixPerson = int(fbPerson.ixperson.string,10)
         fullname = fbPerson.sfullname.string
@@ -236,7 +238,7 @@ class FogBugzBackend(ModelBackend):
         if admin:
             verb1 = 'Adding'
             verb2 = 'to'
-            
+
         if user:
             changed_user = False
             if fbcfg.MAP_ADMIN_AS_SUPER:
@@ -280,29 +282,29 @@ class FogBugzBackend(ModelBackend):
                     logger.debug("Created user (%s) token profile for "
                                  "server (%s).", username, fbcfg.SERVER)
                     fbprofile.save()
-            
-            
+
+
             if not fbcfg.ENABLE_PROFILE_TOKEN or not fbcfg.ENABLE_PROFILE:
                 ## clear the token, as we are not saving it.
                 try:
                     fb.logoff()
-                except Exception, e:
+                except Exception as e:
                     logger.warning("Failed to logoff user (%s) from "
                                    "server (%s): %s", username, fbcfg.SERVER,
                                    str(e))
-                
+
             return user
-        
+
         ## Create a new user and profile and return it.
         if email_login:
             email = username
             username = _username_from_email(email)
         else:
             email = fbPerson.semail.string
-        
+
         logger.debug("Creating new user with token profile for "
                      "user (%s) from server (%s).", username, fbcfg.SERVER)
-        
+
         user = UserModel.objects.create_user(username=username, email=email)
         user.first_name = fullname
         if admin and fbcfg.MAP_ADMIN_AS_SUPER:
@@ -326,12 +328,12 @@ class FogBugzBackend(ModelBackend):
                 is_administrator = admin,
                 token = token)
             fbprofile.save()
-        
+
         if not fbcfg.ENABLE_PROFILE_TOKEN or not fbcfg.ENABLE_PROFILE:
             ## clear the token as we are not saving it
             try:
                 fb.logoff()
-            except Exception, e:
+            except Exception as e:
                 logger.warning("Failed to logoff user (%s) from "
                                "server (%s): %s", username, fbcfg.SERVER,
                                str(e))
