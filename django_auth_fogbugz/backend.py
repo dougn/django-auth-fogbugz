@@ -169,7 +169,7 @@ class FogBugzBackend(ModelBackend):
             ## Log the error
             logger.error("Login Failed: "
                          "FogBugz Server (%s) Connection Error: %s",
-                         fbcfg.SERVER, e.message)
+                         fbcfg.SERVER, str(e))
             return None
 
         if user and fbcfg.ENABLE_PROFILE:
