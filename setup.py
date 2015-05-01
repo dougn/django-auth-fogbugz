@@ -11,7 +11,7 @@ setup(
     author="Doug Napoleone",
     author_email="doug.napoleone+django-auth-fogbugz@gmail.com",
     license="BSD",
-    packages=["django_auth_fogbugz"],
+    packages=find_packages(include=["django_auth_fogbugz*"]),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
